@@ -1,0 +1,26 @@
+CREATE ROLE backend_dev LOGIN PASSWORD '1234';
+CREATE ROLE bi_dev LOGIN PASSWORD '1234';
+CREATE ROLE data_engineer LOGIN PASSWORD '1234';
+
+GRANT CONNECT ON DATABASE uts_db TO backend_dev, bi_dev, data_engineer;
+GRANT USAGE ON SCHEMA "SALAM" TO backend_dev, bi_dev, data_engineer;
+GRANT CREATE ON DATABASE uts_db TO data_engineer;
+
+GRANT SELECT, INSERT, UPDATE, DELETE
+ON ALL TABLES IN SCHEMA "SALAM" TO backend_dev;
+GRANT SELECT ON ALL TABLES IN SCHEMA "SALAM" TO bi_dev;
+
+-- Transfer objek yang sudah dibuat agar data_engineer dapat mengubah/menghapusnya
+ALTER SCHEMA "SALAM" OWNER TO data_engineer;
+ALTER TABLE "SALAM".mahasiswas OWNER TO data_engineer;
+ALTER VIEW "SALAM".v_mahasiswas_ringkas OWNER TO data_engineer;
+
+-- Hak default untuk tabel/view baru yang dibuat postgres atau data_engineer
+ALTER DEFAULT PRIVILEGES FOR ROLE postgres IN SCHEMA "SALAM"
+  GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO backend_dev;
+ALTER DEFAULT PRIVILEGES FOR ROLE postgres IN SCHEMA "SALAM"
+  GRANT SELECT ON TABLES TO bi_dev;
+ALTER DEFAULT PRIVILEGES FOR ROLE data_engineer IN SCHEMA "SALAM"
+  GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO backend_dev;
+ALTER DEFAULT PRIVILEGES FOR ROLE data_engineer IN SCHEMA "SALAM"
+  GRANT SELECT ON TABLES TO bi_dev;
